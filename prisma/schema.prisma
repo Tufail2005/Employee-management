@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserType{
+  IT 
+  HR 
+  Sales 
+  Marketing 
+}
+enum Gender{
+  male 
+  female
+}
+
+enum Role{
+  Employee
+  Admin
+}
+
+model User{
+  id String @id @default(uuid())
+  role Role @default(Employee)
+  name String 
+  phoneNo Int?
+  empId Int @default(autoincrement())
+  userType UserType 
+  gender Gender
+  email String @unique
+  password String
+  DOB DateTime @db.Date
+  qualification String
+  hireDate DateTime @db.Date @default(now())
+  address String
+  pincode Int
+  leaves Leave[]
+  leaveType LeaveType[]
+  holidays Holidays[]
+}
+
+model Leave{
+  id String @id @default(uuid())
+  reason String
+  startDate DateTime @db.Date
+  endDate DateTime @db.Date
+  approval Boolean @default(false)
+  userId String 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LeaveType{
+  id String @id @default(uuid())
+  name String
+  defaultDays Int @default(10)
+  userId String 
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Holidays{
+  id String @id @default(uuid())
+  name String
+  Date DateTime @db.Date
+  description String 
+  userId String 
+  user User @relation(fields: [userId], references: [id])
+}
