@@ -89,3 +89,8 @@ export default async function POST(req: Request) {
         return NextResponse.json({ msg: "Server error" + err }, { status: 500 });
     }
 }
+
+
+export async function GET(req: Request) {
+
+}
