@@ -18,6 +18,13 @@ export default async function POST(req: NextRequest) {
   const { reason, startDate, endDate, approval } = body;
 
   try {
+    if (!reason || !startDate || !endDate || approval) {
+      return NextResponse.json(
+        { error: "you are missing inputs field" },
+        { status: 400 }
+      );
+    }
+
     const new_leave = await prisma.leave.create({
       data: {
         reason,
