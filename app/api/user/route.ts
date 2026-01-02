@@ -4,11 +4,11 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOption);
+  // const session = await getServerSession(authOption);
 
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "you are not log-IN" }, { status: 401 });
-  }
+  // if (!session || !session.user) {
+  //   return NextResponse.json({ error: "you are not log-IN" }, { status: 401 });
+  // }
 
   try {
     const body = await req.json();
@@ -55,6 +55,8 @@ export async function POST(req: Request) {
     const create_user = await prisma.user.create({
       data: {
         ...body,
+        phoneNo: parseInt(body.phoneNo, 10),
+        pincode: parseInt(body.pincode, 10),
         DOB: new Date(body.DOB),
       },
     });
