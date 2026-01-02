@@ -3,10 +3,6 @@ import React from "react";
 export default function LeaveReqList() {
   return (
     <div className="w-full max-w-3xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
-      <button className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white px-4 py-2 rounded-md font-medium transition-colors mb-6">
-        <span className="text-lg">+</span>
-        Create Employee
-      </button>
       {/* Header Section */}
       <div className="p-4 border-b border-gray-100 mt-7">
         <h2 className="text-center text-emerald-800 font-semibold text-lg">
