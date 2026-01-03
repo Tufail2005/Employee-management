@@ -23,6 +23,10 @@ enum Role{
   Employee
   Admin
 }
+enum status{
+  pending
+  approved
+}
 
 model User{
   id String @id @default(uuid())
@@ -49,8 +53,9 @@ model Leave{
   reason String
   startDate DateTime @db.Date
   endDate DateTime @db.Date
-  approval Boolean @default(false)
-  userId String 
+  status status @default(pending)
+  userId String
+  createAt DateTime @default(now())
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -65,7 +70,7 @@ model LeaveType{
 model Holidays{
   id String @id @default(uuid())
   name String
-  Date DateTime @db.Date
+  date DateTime @db.Date
   description String 
   
   userId String

@@ -33,3 +33,11 @@ export const Role = {
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const status = {
+  pending: 'pending',
+  approved: 'approved'
+} as const
+
+export type status = (typeof status)[keyof typeof status]

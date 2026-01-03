@@ -60,7 +60,7 @@ export default function CreateEmployeeForm({ setIsopen }: any) {
         const json = await res.json();
         throw new Error(json.error || "failed to create employee");
       }
-
+      setIsopen(false);
       redirect("/employee/dashboard");
     } catch (err: any) {
       setError(err.message);

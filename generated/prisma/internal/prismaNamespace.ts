@@ -767,8 +767,9 @@ export const LeaveScalarFieldEnum = {
   reason: 'reason',
   startDate: 'startDate',
   endDate: 'endDate',
-  approval: 'approval',
-  userId: 'userId'
+  status: 'status',
+  userId: 'userId',
+  createAt: 'createAt'
 } as const
 
 export type LeaveScalarFieldEnum = (typeof LeaveScalarFieldEnum)[keyof typeof LeaveScalarFieldEnum]
@@ -787,7 +788,7 @@ export type LeaveTypeScalarFieldEnum = (typeof LeaveTypeScalarFieldEnum)[keyof t
 export const HolidaysScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  Date: 'Date',
+  date: 'date',
   description: 'description',
   userId: 'userId'
 } as const
@@ -910,9 +911,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Boolean'
+ * Reference to a field of type 'status'
  */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+export type EnumstatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'status'>
+    
+
+
+/**
+ * Reference to a field of type 'status[]'
+ */
+export type ListEnumstatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'status[]'>
     
 
 

@@ -1,7 +1,7 @@
-import BasicInfo from "@/components/BasicInfo"
+import BasicInfo from "@/components/BasicInfo";
 
 interface PageProps {
-    params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function EmployeeDetails({ params }: PageProps){
@@ -10,4 +10,5 @@ export default async function EmployeeDetails({ params }: PageProps){
     return <div>
         <BasicInfo id={id}/>
     </div>
+  );
 }
