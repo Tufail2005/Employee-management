@@ -1,45 +1,88 @@
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import Input from "./Input";
+import { useRouter } from "next/navigation";
 
-export default function CreateLeave({ setIsopen }: any) {
+interface HolidayFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: {
+    id: string;
+    name: string;
+    date: number | string;
+    description: string;
+  } | null;
+}
+
+export default function HolidayFormModel({
+  isOpen,
+  onClose,
+  initialData,
+}: HolidayFormModalProps) {
+  const router = useRouter();
   const [name, setName] = useState("");
-  const [defaultDays, setDefaultDays] = useState("");
+  const [date, setDate] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const reset = () => {
-    setName("");
-    setDefaultDays("");
-  };
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        // Edit Mode: Prefill data
+        setName(initialData.name);
+        setDate(String(initialData.date));
+        setDescription(String(initialData.description));
+      } else {
+        // Create Mode: Reset
+        setName("");
+        setDate("");
+        setDescription("");
+      }
+      setError(""); // Clear old errors
+    }
+  }, [isOpen, initialData]);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
 
     try {
-      const res = await fetch("api/leavesType", {
-        method: "POST",
+      // Determine Method and URL
+      const isEditMode = !!initialData; // true if initialData exists
+      const url = isEditMode
+        ? `/api/holidays/${initialData.id}` // Edit URL
+        : "/api/holidays"; // Create URL
+
+      const method = isEditMode ? "PATCH" : "POST"; // PATCH updates, POST creates
+
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, defaultDays: Number(defaultDays) }),
+        body: JSON.stringify({
+          name,
+          date,
+          description,
+        }),
       });
 
       if (!res.ok) {
         const json = await res.json();
-        throw new Error(json.error || "Failed to create holiday");
+        throw new Error(json.error || "Operation failed");
       }
-      setIsopen(false);
+
+      // Success: Refresh data and close
+      router.refresh();
+      onClose();
     } catch (err: any) {
       setError(err.message);
-      setTimeout(() => {
-        reset();
-        setError("");
-        setIsSubmitting(false);
-      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -47,7 +90,7 @@ export default function CreateLeave({ setIsopen }: any) {
         {/* Header Section */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100  bg-blue-600">
           <h2 className="text-xl font-bold text-gray-800 items-center">
-            Leaves
+            {initialData ? "Edit Holiday" : "Create Holiday"}
           </h2>
         </div>
 
@@ -73,26 +116,34 @@ export default function CreateLeave({ setIsopen }: any) {
           )}
 
           <Input
-            label="Leave Name"
+            label="Holiday Name"
             type="text"
-            placeholder="e.g. Sick leave"
+            placeholder="e.g. Summer Vacation"
             value={name}
             onChangeState={setName}
           />
 
           <Input
-            label="Default Day"
-            type="number"
-            placeholder="0"
-            value={defaultDays}
-            onChangeState={setDefaultDays}
+            label="Date"
+            type="date"
+            placeholder="Select date"
+            value={date}
+            onChangeState={setDate}
+          />
+
+          <Input
+            label="Description"
+            type="description"
+            placeholder="Add a few details..."
+            value={description}
+            onChangeState={setDescription}
           />
 
           {/* Footer / Action Buttons */}
           <div className="pt-4 flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => setIsopen(false)}
+              onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors"
             >
               Cancel
@@ -107,33 +158,11 @@ export default function CreateLeave({ setIsopen }: any) {
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Saving...
-                </>
-              ) : (
-                "Create Leave"
-              )}
+              {isSubmitting
+                ? "Saving..."
+                : initialData
+                ? "Update Holiday"
+                : "Create Holiday"}
             </button>
           </div>
         </form>
