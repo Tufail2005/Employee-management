@@ -15,10 +15,10 @@ export default async function POST(req: NextRequest) {
 
   const userId = session.user.id;
   const body = await req.json();
-  const { reason, startDate, endDate, approval } = body;
+  const { reason, startDate, endDate, status } = body;
 
   try {
-    if (!reason || !startDate || !endDate || approval) {
+    if (!reason || !startDate || !endDate || !status) {
       return NextResponse.json(
         { error: "you are missing inputs field" },
         { status: 400 }
@@ -30,7 +30,7 @@ export default async function POST(req: NextRequest) {
         reason,
         startDate,
         endDate,
-        approval,
+        status,
         userId,
       },
     });
