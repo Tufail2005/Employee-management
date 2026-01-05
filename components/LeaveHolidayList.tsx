@@ -30,7 +30,7 @@ export default function LeaveHolidayList({ list, type}: LeaveHolidayListProps) {
 
                     {/* 4. Actions Column */}
                     <div className="flex justify-center gap-2">
-                        <EditButton id={obj.id} type={type}/>
+                        <EditButton id={obj.id} type={type} />
                         <DeleteButton id={obj.id} type={type}/>
                     </div>
                 </div>
