@@ -18,6 +18,7 @@ interface LeaveTypeItem {
 
 export interface LeaveHolidayListProps {
     list: (HolidayItem | LeaveTypeItem)[];
+    type: 'leave' | 'holiday';
 }
 
 export default function SearchSection({ list }: LeaveHolidayListProps) {
@@ -27,7 +28,8 @@ export default function SearchSection({ list }: LeaveHolidayListProps) {
         item.name.toLowerCase().includes(searchValue.toLowerCase())
     )
     const isLeaveType = list.length > 0 && "defaultDays" in list[0];
-
+    if(isLeaveType){
+    }
     return (
         <div className="space-y-6">
             {/* Search Input Container */}
@@ -53,7 +55,7 @@ export default function SearchSection({ list }: LeaveHolidayListProps) {
                         <p className="text-gray-400 text-sm">Not matching "{searchValue}"</p>
                     </div>
                 ) : (
-                    <LeaveHolidayList list={filteredList} />
+                    <LeaveHolidayList list={filteredList} type={isLeaveType?"leave":"holiday"}/>
                 )}
             </div>
         </div>

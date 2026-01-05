@@ -11,7 +11,7 @@ export default async function LeaveReqList() {
     },
   });
   return (
-    <div className="w-full max-w-3xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+    <div className=" w-full max-w-3xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
       {/* Header Section */}
       <div className="p-4 border-b border-gray-100 mt-7">
         <h2 className="text-center text-emerald-800 font-semibold text-lg">
