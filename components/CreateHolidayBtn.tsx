@@ -1,19 +1,19 @@
 "use client";
 import { useState } from "react";
-import CreateHoliday from "./CreateHoliday";
+import HolidayFormModel from "./HolidayFormModel";
 import Button from "./Button";
 
 export default function () {
-  const [isOpen, setIsopen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
       <Button
         text="+ add Holiday"
         disabled={false}
         type="button"
-        onClick={() => setIsopen(true)}
+        onClick={() => setIsOpen(true)}
       />
-      {isOpen && <CreateHoliday setIsopen={setIsopen} />}
+      <HolidayFormModel isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   );
 }

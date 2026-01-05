@@ -3,10 +3,10 @@ import prisma from "@/lib/prisma";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     const deletedPost = await prisma.holidays.delete({
       where: {
@@ -24,10 +24,10 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     const body = await req.json();
     const { name, date, description } = body;
 
@@ -37,7 +37,7 @@ export async function PATCH(
       },
       data: {
         name,
-        date,
+        date: new Date(date),
         description,
       },
     });
