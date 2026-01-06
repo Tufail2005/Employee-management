@@ -59,11 +59,11 @@ export default async function LeaveReqList() {
                     </span>
                     <span>
                       requested
-                      {leave.startDate.toLocaleDateString("en-US", {
+                      {new Date(leave.startDate).toLocaleDateString("en-US", {
                         dateStyle: "short",
                       })}
                       -
-                      {leave.endDate.toLocaleDateString("en-US", {
+                      {new Date(leave.endDate).toLocaleDateString("en-US", {
                         dateStyle: "short",
                       })}
                       off
