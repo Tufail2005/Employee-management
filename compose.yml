@@ -1,0 +1,18 @@
+services:
+  web:
+    container_name: ems
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Maps localhost:3000 to container:3000
+    ports:
+      - "3000:3000"
+    # THE FIX FOR ERRORS(coz of my window):
+    volumes:
+      - .:/app # Sync your code (Hot Reload)
+      - /app/node_modules # Anonymous Volume: Prevent Host OS from corrupting Container Deps
+      - /app/.next # Anonymous Volume: Keep build cache inside container
+    environment:
+      # Use the Service Name ('db') as the hostname
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXT_TELEMETRY_DISABLED=1

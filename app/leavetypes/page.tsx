@@ -2,9 +2,27 @@ import prisma from "@/lib/prisma";
 import Button from "@/components/Button";
 import SearchSection from "@/components/SearchSection";
 import CreateLeaveBtn from "@/components/CreateLeaveBtn";
+import { redis } from "@/lib/redis";
+
 
 export default async function LeaveTypes() {
-  const LeaveTypeList = await prisma.leaveType.findMany();
+  const CACHE_KEY = "leavetype:all";
+    let LeaveTypeList = [];
+
+    const cachedData = await redis.get(CACHE_KEY);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        LeaveTypeList = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        LeaveTypeList = await prisma.leaveType.findMany();
+    };
+    if (LeaveTypeList) {
+            await redis.set(CACHE_KEY, JSON.stringify(LeaveTypeList), 'EX', 900);
+    }
+
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-8 font-sans">
@@ -26,7 +44,7 @@ export default async function LeaveTypes() {
 
         {/* Main Content Area */}
         <div className="space-y-6">
-          <SearchSection list={LeaveTypeList} />
+          <SearchSection list={LeaveTypeList} type="leave"/>
         </div>
       </div>
     </div>

@@ -64,7 +64,7 @@ export default function LeaveHolidayList({ list }: LeaveHolidayListProps) {
                 {/* Date or Days */}
                 <div className="text-sm text-gray-600 font-mono italic">
                 {"date" in obj
-                    ? obj.date.toISOString().split("T")[0]
+                    ? new Date(obj.date).toISOString().split("T")[0]
                     : `${obj.defaultDays} days`}
                 </div>
 

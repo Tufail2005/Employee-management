@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOption } from "@/auth";
 import prisma from "@/lib/prisma";
 import { error } from "console";
+import { redis } from "@/lib/redis";
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOption);
 
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
         userId
       },
     });
+    await redis.del("leaves:all")
 
     return NextResponse.json({ msg: "leave is created" }, { status: 200 });
   } catch (err) {

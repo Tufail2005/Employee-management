@@ -1,26 +1,43 @@
 import React from "react";
 import prisma from "@/lib/prisma";
-
+import { redis } from "@/lib/redis";
 export default async function OnLeaveList() {
-  const today = new Date();
-  const Onleaves = await prisma.leave.findMany({
-    where: {
-      startDate: {
-        lte: today,
-      },
+  const CACHE_KEY = "onLeaveList:all";
+    let Onleaves = [];
 
-      endDate: {
-        gte: today,
-      },
-      status:"approved"
-    },
-    include: {
-      user: true,
-    },
-    orderBy: {
-      createAt: "desc",
-    },
-  });
+    const cachedData = await redis.get(CACHE_KEY);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        Onleaves = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        const today = new Date();
+        Onleaves = await await prisma.leave.findMany({
+              where: {
+                startDate: {
+                  lte: today,
+                },
+
+                endDate: {
+                  gte: today,
+                },
+                status:"approved"
+              },
+              include: {
+                user: true,
+              },
+              orderBy: {
+                createAt: "desc",
+              },
+            });
+          };
+    if (Onleaves) {
+            await redis.set(CACHE_KEY, JSON.stringify(Onleaves), 'EX', 900);
+    }
+
+
   return (
     <div className="w-full max-w-sm bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
       {/* Header Section */}
@@ -37,7 +54,7 @@ export default async function OnLeaveList() {
           Today ({Onleaves.length})
         </h3>
 
-        {Onleaves.map((onleave) => (
+        {Onleaves.map((onleave:any) => (
           <div key={onleave.id}>
             {/* Single Employee Card */}
             <div className="flex items-center gap-3 border border-gray-200 rounded-lg p-3 bg-white">

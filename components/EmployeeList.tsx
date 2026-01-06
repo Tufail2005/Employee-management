@@ -1,12 +1,30 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+
 
 export default async function EmployeeList() {
-    const users = await prisma.user.findMany({});
+    const CACHE_KEY = "employees:all";
+    let users = [];
+
+    const cachedData = await redis.get(CACHE_KEY);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        users = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        users = await prisma.user.findMany({});
+    };
+    if (users) {
+            await redis.set(CACHE_KEY, JSON.stringify(users), 'EX', 900);
+    }
+
 
     return (
         <div className="divide-y divide-gray-200">
-        {users.map((user) => (
+        {(users).map((user:any) => (
             <div key={user.id} className="grid grid-cols-5 px-6 py-4 items-center hover:bg-gray-50 transition-colors">
             
             <div className="flex items-center gap-3">

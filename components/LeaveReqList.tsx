@@ -1,16 +1,34 @@
 import prisma from "@/lib/prisma";
 import LeaveStatus from "./LeaveStatusButton";
-
+import { redis } from "@/lib/redis";
 
 export default async function LeaveReqList() {
-  const leaves = await prisma.leave.findMany({
-    include: {
-      user: true,
-    },
-    orderBy: {
-      createAt: "desc",
-    },
-  });
+  const CACHE_KEY = "leaves:all";
+    let leaves = [];
+
+    const cachedData = await redis.get(CACHE_KEY);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        leaves = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        leaves = await prisma.leave.findMany({
+          include: {
+            user: true,
+          },
+          orderBy: {
+            createAt: "desc",
+          },
+        });
+    };
+    if (leaves) {
+            await redis.set(CACHE_KEY, JSON.stringify(leaves), 'EX', 900);
+    }
+
+
+
   return (
     <div className=" w-full max-w-3xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
       {/* Header Section */}
@@ -22,7 +40,7 @@ export default async function LeaveReqList() {
 
       {/* List Container */}
       <div className="p-6">
-        {leaves.map((leave) => (
+        {leaves.map((leave:any) => (
           <div key={leave.id}>
             {/* Single List Item Card */}
             <div className="flex items-center justify-between border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer">

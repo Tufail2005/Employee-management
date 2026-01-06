@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 
 export async function DELETE(
   req: NextRequest,
@@ -13,6 +14,7 @@ export async function DELETE(
         id: id,
       },
     });
+    await redis.del("holidays:all")
     return NextResponse.json(deletedPost, { status: 200 });
   } catch (err) {
     return NextResponse.json(
@@ -41,6 +43,8 @@ export async function PATCH(
         description,
       },
     });
+
+    await redis.del("holidays:all");
 
     return NextResponse.json(updatedPost, { status: 200 });
   } catch (error) {

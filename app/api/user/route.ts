@@ -2,6 +2,9 @@ import { authOption } from "@/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { redis } from "@/lib/redis";
+
+
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOption);
@@ -60,6 +63,11 @@ export async function POST(req: Request) {
         DOB: new Date(body.DOB),
       },
     });
+
+    await redis.del("employees:all")
+  
+
+
     return NextResponse.json({
       msg: "Employee got created",
     });

@@ -1,14 +1,28 @@
 import prisma from "@/lib/prisma";
-
+import { redis } from "@/lib/redis";
 interface idType {
     id: string;
 }
 
 export default async function BasicInfo({ id }: idType) {
     // Fetch the specific user based on the passed ID
-    const user = await prisma.user.findUnique({
+    const cacheId = `${id}`;
+    let user = null;
+    const cachedData = await redis.get(cacheId);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        user = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        user = await prisma.user.findUnique({
         where: { id: id }
     });
+    if (user) {
+            await redis.set(cacheId, JSON.stringify(user), 'EX', 1800);
+        }
+    }
 
     return (
         <div className="bg-white p-8 rounded-lg shadow-sm max-w-4xl border-t-4 border-blue-700">

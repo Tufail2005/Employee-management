@@ -2,9 +2,26 @@ import prisma from "@/lib/prisma";
 import Button from "@/components/Button";
 import SearchSection from "@/components/SearchSection";
 import CreateHolidayBtn from "@/components/CreateHolidayBtn";
-
+import { redis } from "@/lib/redis";
 export default async function Holidays() {
-  const holidayList = await prisma.holidays.findMany();
+
+  const CACHE_KEY = "holidays:all";
+    let holidayList = [];
+
+    const cachedData = await redis.get(CACHE_KEY);
+
+    if(cachedData){
+        console.log("🚀 Cache HIT")
+        // Redis stores strings, so we must parse it back to an Object
+        holidayList = JSON.parse(cachedData); //parse=> string to object 
+    }else{
+        console.log("🐢 Cache MISS");
+        holidayList = await prisma.holidays.findMany();
+    };
+    if (holidayList) {
+            await redis.set(CACHE_KEY, JSON.stringify(holidayList), 'EX', 900);
+    }
+    
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-8 font-sans">
@@ -26,7 +43,7 @@ export default async function Holidays() {
 
         {/* Main Content Area */}
         <div className="space-y-6">
-          <SearchSection list={holidayList} />
+          <SearchSection list={holidayList} type="holiday" />
         </div>
       </div>
     </div>
